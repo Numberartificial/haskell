@@ -1,12 +1,23 @@
 module Chap17 where
 
+{-# LANGUAGE ViewPattern #-}
 import Control.Applicative (ZipList, liftA2, liftA3)
 import Data.List (elemIndex)
 import Data.Monoid
 import Control.Monad
 import Test.QuickCheck
+import Test.QuickCheck.Function
 import Test.QuickCheck.Checkers
 import Test.QuickCheck.Classes
+import Data.Char
+import qualified Data.Map  as M
+
+
+xx = (,) <$> [1, 2] <*> [3, 4]
+ioX = (++) <$> getLine <*> getLine
+
+toU (x:xs) = toUpper x : xs
+tU = fmap toU $ M.lookup 3 (M.fromList [(3, "hello")])
 
 added :: Maybe Integer
 added = (+3) <$> (lookup 3 $ zip [1, 2, 3] [4, 5, 6])
@@ -18,7 +29,8 @@ z :: Maybe Integer
 z = lookup 2 $ zip [1, 2, 3] [4, 5, 6]
 
 tupled :: Maybe (Integer, Integer)
-tupled = (,) <$> y  <*> z
+-- tupled = (,) <$> y  <*> z
+tupled = liftA2 (,) y z
 
 x :: Maybe Int
 x = elemIndex 3 [1, 2, 3, 4, 5]
@@ -49,6 +61,7 @@ instance Applicative Identity where
   pure = Identity
   (<*>) (Identity f) (Identity a) = Identity (f a)
 
+tI = const <$> [1,2 , 3]<*> [2,3, 4]
 
 newtype Constant a b = Constant { getConstant :: a }
                      deriving (Eq, Ord, Show)
@@ -97,6 +110,11 @@ cowFromString name' age' weight' =
       <*> (noNegative age')
       <*> (noNegative weight')
 
+cow1 :: Maybe (Int -> Int -> Cow)
+cow1 = fmap Cow $ noEmpty "haha"
+
+---- Applicative laws ---
+-- pure id <*> v == v
 
 -- instance Monoid a => Monoid (ZipList a) where
 --   mempty = pure mempty
@@ -105,6 +123,15 @@ cowFromString name' age' weight' =
 -- instance Applicative ZipList where
 --   (<*>) (ZipList f) (ZipList x) = ZipList (f x)
 
+-- Composition
+-- Here is the definition of the composition law for applica- tives:
+-- pure (.) <*> u <*> v <*> w = u <*> (v <*> w)
+
+-- Homomorphism
+-- pure f <*> pure x = pure (f x)
+
+-- Interchange
+-- pure f <*> pure x = pure ($ x) <*> pure f
 instance Eq a => EqProp (ZipList a) where
   (=-=) = eq
 

@@ -1,8 +1,14 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE RankNTypes #-}
 module Chap16 where
 
+{-# LANGUAGE ViewPatterns#-}
+
 import Test.QuickCheck
+import Test.QuickCheck.Function
 import Control.Monad
 import Data.Char
+
 
 replaceWithP = const 'p'
 
@@ -33,6 +39,18 @@ functorCompose :: (Eq (f c), Functor f) => (a -> b)
                   -> Bool
 functorCompose f g x = (fmap g (fmap f x)) == (fmap (g . f) x)
 
+functorCompose' :: (Eq (f c), Functor f) => f a -> Fun a b -> Fun b c -> Bool
+functorCompose'  x (Fun _ f) (Fun _ g) =
+  (fmap (g . f) x) == (fmap g . fmap f) x
+
+type IntToInt = Fun Int Int
+type IntFC = [Int] -> IntToInt -> IntToInt -> Bool
+testGenFun = quickCheck (functorCompose' :: IntFC)
+
+
+-----------------quickCheck 生成函数:
+-- {-# LANGUAGE ViewPatterns#-}
+-- import Test.QuickCheck.Function
 
 newtype Identity a = Identity a deriving (Eq, Show)
 
@@ -57,7 +75,7 @@ instance (Arbitrary a) => Arbitrary (Pair a) where
 testPair = do
   quickCheck $ \x -> functorIdentity(x::(Pair Int))
   quickCheck $ \x -> functorCompose (*1) (+2) (x::(Pair Int))
-  
+
 ---------------------------------------------------
 
 data Three a b c = Three a b c deriving(Eq, Show)
@@ -106,6 +124,15 @@ instance Functor Possibly where
   fmap f LolNope = LolNope
   fmap f (Yeppers a) = Yeppers (f a)
 
+data P a = Null | P a deriving (Eq, Show)
+instance Functor P where
+  fmap f Null = Null
+  fmap f (P a) = P (f a)
+
+data ResultH e b = Wrong e | Ok b deriving (Eq, Show)
+instance Functor (ResultH e) where
+  fmap f (Wrong e) = Wrong e
+  fmap f (Ok b) = Ok (f b)
 
 data Sum a b = First a
              | Second b
@@ -121,8 +148,27 @@ newtype Constant a b = Constant {constant :: a} deriving(Eq, Show)
 instance Functor (Constant a) where
   fmap _ (Constant b) = Constant b
 
+-----wrap----
+
+data Wrap f a = Wrap (f a) deriving (Eq, Show)
+
+instance (Functor f) => Functor (Wrap f) where
+  fmap f (Wrap fa) = Wrap (fmap f fa)
+
 getInt :: IO Int
 getInt = fmap read getLine
+
+-----RankNTypes: higher-kinded types ---
+--   {-# LANGUAGE RankNTypes #-}
+--   :set -XRankNTypes
+-- -- nat :: (f -> g) -> f a -> g a
+-- nat = undefined
+type Nat f g = forall a. f a -> g a
+maybeToList :: Nat Maybe []
+maybeToList Nothing = []
+maybeToList (Just a) = [a]
+
+newtype Mu f = InF { outF :: f (Mu f) }
 
 data Company a b c = DeepBlue a c
                    | Something b
@@ -138,6 +184,28 @@ instance Functor (More x) where
   fmap f (L a b a') = L (f a) b (f a')
   fmap f (R b a b') = R b (f a) b'
 
+data Quant a b =
+  Finance
+  | Desk a
+  | Bloor b
+    deriving (Show, Eq)
+
+instance Functor (Quant a) where
+  fmap f (Bloor b) = Bloor (f b)
+  fmap f (Finance) = Finance
+  fmap f (Desk a) = Desk a
+
+
+--FlexibleInstances
+--  {-# LANGUAGE FlexibleInstances #-}
+
+newtype Flip f a b =
+  Flip1 (f b a) deriving (Eq, Show)
+
+newtype K a b = K1 a
+
+instance Functor (Flip K a)where
+  fmap f (Flip1 (K1 a)) = Flip1 (K1 $ f a)
 
 data List2 a b = List2 a b deriving(Eq, Show)
 instance Functor (List2 a) where
@@ -190,7 +258,6 @@ data TalkToMe a = Halt
 
 instance Functor TalkToMe where
   fmap f Halt = Halt
---   fmap f (Print String a) = Print String (f a)
---   fmap f (Read g) = Read f.g
-         
+  fmap f (Print s a) = Print s (f a)
+  fmap f (Read g) = Read $ f.g
 
