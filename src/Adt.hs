@@ -17,10 +17,10 @@ data Manufacturer = Mini
                   | Tata
                   deriving (Eq, Show)
 
-data Airline = PapuAir 
-             | CatapultsR'Us
+data Airline = PapuAir
+             | CatapultsRUs
              | TakeYourChancesUnited
-             deriving (Eq, Show)
+                 deriving (Eq, Show)
 
 data Vehicle = Car Manufacturer Price
              | Plane Airline Size

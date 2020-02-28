@@ -112,4 +112,6 @@ capStr (x:xs) = (toUpper x):xs
 capStr2 :: [Char] -> Char
 capStr2 = toUpper . head
 
+reverse
+
 
