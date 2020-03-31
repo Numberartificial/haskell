@@ -1,0 +1,70 @@
+{
+"bigdata_online_match_1001": {
+"mappings": {
+  "online_match_1001": {
+  "properties": {
+  "age": {
+  "type": "long"
+},
+  "gender": {
+  "type": "text",
+  "fields": {
+  "keyword": {
+  "type": "keyword",
+  "ignore_above": 256
+}
+}
+},
+  "is_god": {
+  "type": "long"
+},
+  "locate_city": {
+  "type": "text",
+  "fields": {
+  "keyword": {
+  "type": "keyword",
+  "ignore_above": 256
+}
+}
+},
+  "p_age_l": {
+  "type": "long"
+},
+  "p_age_r": {
+  "type": "long"
+},
+  "p_gender_set": {
+  "type": "text",
+  "fields": {
+  "keyword": {
+  "type": "keyword",
+  "ignore_above": 256
+}
+}
+},
+  "pay_order_cnt_all": {
+  "type": "long"
+},
+  "platform_order_class": {
+  "type": "long"
+},
+  "recieve_order_cnt_all": {
+  "type": "long"
+},
+  "recieve_order_cnt_r7d": {
+  "type": "long"
+},
+  "register_time": {
+  "type": "long"
+},
+  "start": {
+  "type": "long"
+},
+  "uid": {
+  "type": "long"
+}
+}
+}
+}
+}
+}
