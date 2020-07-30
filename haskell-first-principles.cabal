@@ -18,8 +18,7 @@ library
   other-modules:       RW.CH5.SimpleJSON
                      , RW.CH5.PutJSON
                      , RW.CH11.QC
-                     , BX.Chartd
-                    
+
   build-depends:       base >= 4.9 && < 5, time >= 1.5.0
                      , QuickCheck
                      , checkers
@@ -41,6 +40,8 @@ library
                      , hedis
                      , lens
                      , csv
+                     , regex-posix
+
   default-language:    Haskell2010
 
 executable haskell-first-principles-exe
