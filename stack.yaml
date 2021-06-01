@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-11.8
+resolver: lts-16.31
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -37,6 +37,7 @@ resolver: lts-11.8
 # will not be run. This is useful for tweaking upstream packages.
 packages:
 - '.'
+- 'paralleld'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
 extra-deps: []
@@ -47,7 +48,7 @@ flags: {}
 extra-package-dbs: []
 
 # Control whether we use the GHC we find on the path
-system-ghc: true
+system-ghc: false
 # 
 # Require a specific version of stack, using version ranges
 # require-stack-version: -any # Default
@@ -64,3 +65,13 @@ system-ghc: true
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minorhaskell-programming-from-first-principles-master.zip
 allow-newer: true
+
+ghc-options:
+  "$everything": -haddock
+  "$locals": -Wall
+  "$targets": -Werror
+  "$everything": -O2
+
+# configure-options:
+#   parralleld:
+#   - -02 -threaded
